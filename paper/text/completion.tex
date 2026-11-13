@@ -33,8 +33,11 @@ moves as $q(s)=\Delta_\theta(s)^{-1}W^{\top}R_{\rm i}^{\top}f(s)$
 fitted damping force $M_0T\Gamma\dot q$ and the load $M_0TT^{\top}Bf$ that
 the $r$ modes carry. By Eq.~\eqref{eq:latent} the residual force is
 \begin{equation}
- M_0\ddot u+M_0T\Gamma\dot q+K_0u-M_0TT^{\top}Bf=Gq,\qquad
- G=K_0T-M_0T\Omega^2.
+ \begin{aligned}
+ M_0\ddot u+M_0T\Gamma\dot q+K_0u-M_0TT^{\top}Bf
+ &=M_0T\bigl(\ddot q+\Gamma\dot q+\Omega^2q-T^{\top}Bf\bigr)+Gq=Gq,\\
+ G&=K_0T-M_0T\Omega^2.
+ \end{aligned}
  \label{eq:dynamic-defect}
 \end{equation}
 The loss is the strain energy of this residual relative to the strain
