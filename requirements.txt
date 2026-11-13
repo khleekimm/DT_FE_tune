@@ -1,0 +1,11 @@
+# Environment used for revision verification and figures. Python 3.12.
+numpy==2.5.3
+scipy==1.18.1
+h5py==3.16.0
+matplotlib==3.11.2
+pillow==12.3.0
+# pillow-heif is needed only to regenerate the cropped photographs from HEIC.
+pillow-heif
+
+# Reproducible PDF rendering audit.
+PyMuPDF==2.0

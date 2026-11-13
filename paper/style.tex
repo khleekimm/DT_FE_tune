@@ -1,0 +1,52 @@
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\linespread{1.04}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,graphicx,microtype}
+\IfFormatAtLeastTF{2026-06-01}{\usepackage{array}}{\usepackage{array}[=2024-06-01]}
+\usepackage{caption,placeins,flafter,xurl}
+\usepackage{tikz}
+\usepackage{tikz-cd}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true,allcolors=blue,bookmarksopen=true,bookmarksnumbered=true]{hyperref}
+\usepackage{bookmark}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\range}{range}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\R}{\mathbb R}
+\newcommand{\C}{\mathbb C}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\graphicspath{{../figures/paper/}}
+\setlength{\textfloatsep}{14pt plus 2pt minus 3pt}
+\setlength{\floatsep}{12pt plus 2pt minus 3pt}
+\setlength{\intextsep}{12pt plus 2pt minus 3pt}
+\captionsetup{font=small,labelfont=bf}
+\makeatletter\renewcommand{\fps@figure}{tb}\renewcommand{\fps@table}{tb}\makeatother
+\renewcommand{\topfraction}{.94}
+\renewcommand{\bottomfraction}{.88}
+\renewcommand{\textfraction}{.06}
+\renewcommand{\floatpagefraction}{.9}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{3}
+\setcounter{totalnumber}{5}
+\author{}\date{}
+\makeatletter
+\renewcommand{\maketitle}{\begin{center}\LARGE\@title\par\end{center}\vspace{2pt}}
+\makeatother
+\flushbottom
+
+\renewcommand{\bibfont}{\footnotesize}
+\setlength{\bibsep}{4.25pt plus 0.5pt}
+\setlength{\emergencystretch}{1em}
+\allowdisplaybreaks[1]

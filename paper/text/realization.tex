@@ -1,0 +1,151 @@
+\section{Realization and queries}\label{sec:realization}
+For the accepted full-column-rank map $T_\theta$, the FE-space receptance is
+\begin{equation}
+ \mathcal R_\theta(s)=T_\theta\Delta_\theta(s)^{-1}T_\theta^{\top}
+ =\sum_{k=1}^{2r}\frac{\psi_k\psi_k^{\top}}{s-\lambda_k},\qquad
+ \psi_k=T_\theta\phi_k,
+ \label{eq:receptance}
+\end{equation}
+so that $u(s)=\mathcal R_\theta(s)Bf(s)$ and
+$s^2S\mathcal R_\theta(s)B=H_\theta(s)$ for zero initial conditions. The
+$\psi_k$ are the damped mode shapes on the mesh. Padding the modal matrix
+with $n-r$ zero columns shows that this is a modal model on the whole mesh:
+\begin{equation}
+ \mathcal R_\theta(s)=\begin{bmatrix}T_\theta&0\end{bmatrix}
+ \begin{bmatrix}\Delta_\theta(s)^{-1}&0\\0&\Delta_{\rm c}(s)^{-1}\end{bmatrix}
+ \begin{bmatrix}T_\theta&0\end{bmatrix}^{\top}
+ \quad\text{for every invertible }\Delta_{\rm c}(s).
+ \label{eq:trivial-modes}
+\end{equation}
+The $n-r$ unidentified directions are trivial modes of zero shape. They
+carry no residue, and whatever dynamics $\Delta_{\rm c}$ is assigned to them
+never enters a response. No nodes or coordinates have to be selected. Motion
+outside $\range T_\theta$ is not represented.
+
+The same model has mass, damping and stiffness operators on the FE space.
+Choose any left inverse $V\in\R^{r\times n}$, $VT_\theta=I_r$, so that $q=Vu$
+on $\range T_\theta$ and $P_V=T_\theta V$ projects onto that subspace.
+\begin{theorem}[Realization]\label{thm:realization}
+Let $T_\theta$ have full column rank, $VT_\theta=I_r$, and define
+\begin{equation}
+ \mathcal M=V^{\top}V,\qquad
+ \mathcal C=V^{\top}\Gamma V,\qquad
+ \mathcal K=V^{\top}\Omega^2V,\qquad
+ \mathcal D(s)=s^2\mathcal M+s\mathcal C+\mathcal K.
+ \label{eq:realization}
+\end{equation}
+\begin{enumerate}
+\item[(i)] The three operators are symmetric positive semidefinite of rank
+$r$, with common kernel $\ker V$. For $u\in\range T_\theta$,
+\[
+ \mathcal M\ddot u+\mathcal C\dot u+\mathcal Ku=P_V^{\top}Bf
+ \quad\Longleftrightarrow\quad
+ \ddot q+\Gamma\dot q+\Omega^2q=T_\theta^{\top}Bf,\qquad q=Vu.
+\]
+\item[(ii)] Wherever $\Delta_\theta(s)$ is invertible,
+$\mathcal D\mathcal R_\theta=P_V^{\top}$ and
+$\mathcal R_\theta\mathcal D=P_V$, so $\mathcal R_\theta$ is a reflexive
+generalized inverse of $\mathcal D$ \citep{benisrael2003}, independent of
+$V$. For any load matrix $B'$ and output matrix $S'$ the accelerance is
+$s^2S'\mathcal R_\theta(s)B'$. At the registered ports it is $H_\theta(s)$.
+\item[(iii)] If $\Pi$ selects $r$ displacement rows with $P=\Pi T_\theta$
+invertible, then $V=P^{-1}\Pi$ gives $\mathcal M=\Pi^{\top}M_\theta\Pi$,
+$\mathcal C=\Pi^{\top}C_\theta\Pi$, $\mathcal K=\Pi^{\top}K_\theta\Pi$ with the
+positive definite
+\[
+ M_\theta=P^{-\top}P^{-1},\qquad
+ C_\theta=P^{-\top}\Gamma P^{-1},\qquad
+ K_\theta=P^{-\top}\Omega^2P^{-1},\qquad
+ \kappa_2(M_\theta)=\kappa_2(P)^2.
+\]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Since $VT_\theta=I_r$, $V$ has rank $r$ and $P_V^2=P_V$,
+$P_VT_\theta=T_\theta$, $VP_V=V$.
+
+(i) For $X\in\{I_r,\Gamma,\Omega^2\}$ the form
+$u^{\top}V^{\top}XVu=(Vu)^{\top}X(Vu)$ vanishes only when $Vu=0$, because
+$X\succ0$. So the three operators are positive semidefinite with kernel
+$\ker V$ and rank $r$. For $u=T_\theta q$ the FE equation is exactly
+\[
+ V^{\top}\bigl(\ddot q+\Gamma\dot q+\Omega^2q-T_\theta^{\top}Bf\bigr)=0,
+\]
+and $q=Vu$. Injectivity of $V^{\top}$ proves the equivalence.
+
+(ii) By Eq.~\eqref{eq:realization}, $\mathcal D=V^{\top}\Delta_\theta V$.
+Where $\Delta_\theta$ is invertible, direct multiplication gives
+\[
+ \mathcal D\mathcal R_\theta
+ =V^{\top}\Delta_\theta(VT_\theta)\Delta_\theta^{-1}T_\theta^{\top}
+ =P_V^{\top},\qquad
+ \mathcal R_\theta\mathcal D
+ =T_\theta\Delta_\theta^{-1}(VT_\theta)^{\top}\Delta_\theta V=P_V.
+\]
+As $P_V^{\top}\mathcal D=\mathcal D$ and
+$P_V\mathcal R_\theta=\mathcal R_\theta$, both generalized-inverse
+identities follow. Under a load $B'f$ the modal response is
+$q=\Delta_\theta^{-1}T_\theta^{\top}B'f$. So the output
+$s^2S'T_\theta q$ equals $s^2S'\mathcal R_\theta B'f$. At the registered
+ports $ST_\theta=R_{\rm o}W$ and $T_\theta^{\top}B=W^{\top}R_{\rm i}^{\top}$
+give $H_\theta$. None of these responses contains $V$.
+
+(iii) For $V=P^{-1}\Pi$, $VT_\theta=P^{-1}P=I_r$. Substitution gives
+$\mathcal M=\Pi^{\top}P^{-\top}P^{-1}\Pi$ and the analogous damping and
+stiffness identities. Congruence with $P^{-1}$ preserves positive
+definiteness. Finally $M_\theta=(PP^{\top})^{-1}$ has eigenvalues
+$\sigma_i(P)^{-2}$, so $\kappa_2(M_\theta)=\kappa_2(P)^2$.
+\end{proof}
+
+Since $VT_\theta=I_r$, the realized operators reproduce the fitted modal
+model exactly:
+\[
+ T_\theta^{\top}\mathcal MT_\theta=I_r,\quad
+ T_\theta^{\top}\mathcal CT_\theta=\Gamma,\quad
+ T_\theta^{\top}\mathcal KT_\theta=\Omega^2,\quad
+ \mathcal KT_\theta=\mathcal MT_\theta\Omega^2.
+\]
+The last identity is Eq.~\eqref{eq:intertwining} with $(\mathcal M,\mathcal K)$
+in place of $(M_0,K_0)$. The realized operators satisfy it exactly. The
+nominal ones satisfy it only as closely as $J_F$ allows along the measured
+motion.
+
+Part~(iii) is the square realization in selected coordinates $x=\Pi u=Pq$.
+With $L=T_\theta P^{-1}$ it reads $u=Lx$,
+$M_\theta\ddot x+C_\theta\dot x+K_\theta x=L^{\top}Bf$ and $a=SL\ddot x$.
+Its conditioning is that of the row selection, not of the model.
+Appendix~\ref{sec:state-details} gives the selection and the state-space form
+with the acceleration feedthrough
+$\lim_{|s|\to\infty}H_\theta(s)=R_{\rm o}WW^{\top}R_{\rm i}^{\top}$.
+For the nominal-mass choice
+$V=(T_\theta^{\top}M_0T_\theta)^{-1}T_\theta^{\top}M_0$, $P_V$ is the
+$M_0$-orthogonal projector. For every left inverse
+\[
+ \mathcal M-P_V^{\top}M_0P_V=V^{\top}(I_r-T_\theta^{\top}M_0T_\theta)V,\qquad
+ \mathcal K-P_V^{\top}K_0P_V=V^{\top}(\Omega^2-T_\theta^{\top}K_0T_\theta)V.
+\]
+So the realized and projected nominal operators differ by the Gram defects
+of the completed map. These defects follow from the completion and are not
+fitted.
+
+A query names a frequency band $\mathcal B$, load directions $B'$ and response
+directions $S'$. Its answer is the complex accelerance with phase
+\begin{equation}
+ H'(s)=s^2S'\mathcal R_\theta(s)B',\qquad s=\mathrm i2\pi\nu,\quad\nu\in\mathcal B.
+ \label{eq:query}
+\end{equation}
+At registered ports it reproduces the fitted FRFs. Elsewhere it inherits
+the accuracy of the completion. The inverse query takes known force locations
+and measured accelerations,
+\begin{equation}
+ f_\theta(s)=\argmin_{f\in\C^p}
+ \|D(s)^{-1}(a(s)-H_\theta(s)f)\|_2^2,\qquad
+ u_\theta(s)=\mathcal R_\theta(s)Bf_\theta(s),
+ \label{eq:force-query}
+\end{equation}
+where $D(s)$ is a positive diagonal matrix of channel-error scales. The
+estimate is unique when $D^{-1}H_\theta$ has full column rank, and
+$u_\theta$ is the displacement it implies on the whole mesh.
+Appendix~\ref{sec:forces} builds $D$ from training residuals and evaluates
+the estimate with two and with one active force.

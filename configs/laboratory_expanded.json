@@ -1,0 +1,63 @@
+{
+  "fit_channels": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    9,
+    10,
+    11,
+    12,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    25,
+    28,
+    29,
+    30,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39
+  ],
+  "held_channels": [
+    8,
+    40
+  ],
+  "r": 384,
+  "width": 24,
+  "alpha": 1e-05,
+  "iterations_per_stage": 1000,
+  "stages": 3,
+  "training_record": "test_96",
+  "monitor_record": "test_101",
+  "assessment_record": "test_103",
+  "spatial_prior_candidates": [
+    "gradient_rigid",
+    "curvature_rigid"
+  ],
+  "initial_model": "artifacts/model/laboratory/r384_w24.npz",
+  "output": "artifacts/model/laboratory_expanded",
+  "scope": "Fixed-order expansion to all 31 unflagged non-held response channels. Stored nominal coordinates and surface-normal directions are declared assumptions; channel-to-coordinate permutation for ch1--32 remains unverified. Ch8 and A8 are excluded from all fitting and choices. Original five-response order selection remains historical evidence.",
+  "excluded_channels": [
+    13,
+    23,
+    24,
+    26,
+    27,
+    31,
+    32
+  ]
+}

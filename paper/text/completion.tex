@@ -1,0 +1,148 @@
+\section{Step 2: completing \texorpdfstring{$T$}{T} away from the ports}\label{sec:completion}
+Step~(ii) of Eq.~\eqref{eq:two-steps} fixes the fitted
+$\theta=(W,\omega,\Gamma)$ and selects $T$ from the family
+\begin{equation}
+ \mathcal T(\theta)=\{T\in\R^{n\times r}:AT=W\}.
+ \label{eq:family}
+\end{equation}
+By Eq.~\eqref{eq:ports-see} every member reproduces the fitted FRFs. Two
+requirements select the member. It must keep every modal coordinate, and
+the lifted motion $u=Tq$ should obey the nominal equation of motion.
+
+\subsection{Keeping every modal coordinate}
+Port matching alone need not give $T$ independent columns, because
+$W\in\R^{h\times r}$ can have fewer rows than columns. We therefore require
+\begin{equation}
+ \sigma_r(RT)\ge\delta>0,
+ \label{eq:margin}
+\end{equation}
+where $R\in\R^{n_{\rm d}\times n}$ selects the $n_{\rm d}\ge r$ represented
+translation rows of $u$. Then $RT$ has full column rank and
+\begin{equation}
+ V=(RT)^{\dagger}R,\qquad VT=I_r,\qquad\|V\|_2\le\delta^{-1}.
+ \label{eq:completion-left-inverse}
+\end{equation}
+For a field $u=Tq$, $V$ recovers $q=Vu$ from the represented translations
+by least squares, with error amplification at most $1/\delta$.
+
+\subsection{Loss function and constraints}
+The loss measures how far the lifted motion $u=Tq$ is from obeying the
+nominal equation of motion. Under the measured forces the fitted model
+moves as $q(s)=\Delta_\theta(s)^{-1}W^{\top}R_{\rm i}^{\top}f(s)$
+(Eq.~\eqref{eq:model}). Insert $u=Tq$ into the nominal equation with the
+fitted damping force $M_0T\Gamma\dot q$ and the load $M_0TT^{\top}Bf$ that
+the $r$ modes carry. By Eq.~\eqref{eq:latent} the residual force is
+\begin{equation}
+ M_0\ddot u+M_0T\Gamma\dot q+K_0u-M_0TT^{\top}Bf=Gq,\qquad
+ G=K_0T-M_0T\Omega^2.
+ \label{eq:dynamic-defect}
+\end{equation}
+The loss is the strain energy of this residual relative to the strain
+energy of the fitted model. Both are summed over the frequency lines
+$\nu_\ell$ of the test, with $q_\ell=q(s_\ell)$:
+\begin{equation}
+ J_F(\theta,T)
+ =\frac{\sum_\ell\|Gq_\ell\|_{K_0^{-1}}^2}{\sum_\ell q_\ell^*\Omega^2q_\ell}
+ =\frac{\tr\bigl(G^{\top}K_0^{-1}G\,\Phi_q\bigr)}{\tr(\Omega^2\Phi_q)}.
+ \label{eq:dynamic-objective}
+\end{equation}
+Here $\|x\|_X^2=x^*Xx$. A force $g$ causes the static deflection
+$K_0^{-1}g$, and $\|g\|_{K_0^{-1}}^2$ is twice its strain energy. The second
+form holds because $G$ does not depend on $\ell$. Both sums then need only
+the $r\times r$ modal response matrix
+\begin{equation}
+ \Phi_q=\operatorname{Re}\sum_\ell\Delta_\theta(s_\ell)^{-1}W^{\top}R_{\rm i}^{\top}
+ \Phi_{ff}(\nu_\ell)R_{\rm i}W\Delta_\theta(s_\ell)^{-*}\,\Delta\nu\succeq0.
+ \label{eq:Pi}
+\end{equation}
+It is $\operatorname{Re}\sum_\ell q_\ell q_\ell^*\Delta\nu$ with the force
+spectral matrices $\Phi_{ff}(\nu_\ell)$ of the training record in place of
+$f(s_\ell)f(s_\ell)^*$. Here $\Delta\nu$ is the line spacing. The matrix
+$\Phi_q$ records how much the test moves each mode. It brings the
+identified damping and the measured forces into the loss. It does not
+depend on $T$, so $J_F$ is quadratic in $T$. The loss is dimensionless and
+vanishes when
+\begin{equation}
+ K_0T=M_0T\Omega^2,
+ \label{eq:intertwining}
+\end{equation}
+that is, when every column of $T$ is a nominal mode shape at its fitted
+frequency. An imperfect nominal model generally admits no such $T$ with
+$AT=W$. So the loss is minimized subject to three constraints:
+\begin{equation}
+ \boxed{\ \min_{T}\ J_F(\theta,T)\quad\text{subject to}\quad
+ AT=W,\quad\sigma_r(RT)\ge\delta,\quad t_1,\ldots,t_r\in\mathcal U.\ }
+ \label{eq:completion-problem}
+\end{equation}
+The port constraint keeps the fitted FRFs. The margin keeps every modal
+coordinate. The columns $t_j$ of $T$ lie in a trial space $\mathcal U$ with
+$A\mathcal U=\R^h$, so that every port value is reachable. The chain uses
+$\mathcal U=\R^3$. The laboratory space holds the static deflections under
+the 33 unit port forces and 384 compliant fields that no port sees
+(Appendix~\ref{sec:field-selection}).
+
+\subsection{Feasibility and optimality}
+
+The trial space must leave room for rank $r$. A dependence $Tv=0$ forces
+$Wv=ATv=0$, so only $\ker W$ is at risk, and there $T$ maps into
+$\mathcal U\cap\ker A$, of dimension $\dim\mathcal U-h$. A member of rank
+$r$ therefore exists if and only if
+\begin{equation}
+ \dim\mathcal U-h\ \ge\ r-\rank W.
+ \label{eq:rank-feasibility}
+\end{equation}
+Necessity is this injectivity. For sufficiency take any $T_1$ with
+$AT_1=W$, keep it on the orthogonal complement of $\ker W$ and map
+$\ker W$ injectively into $\mathcal U\cap\ker A$. The chain has $1\ge1$
+and the laboratory $384\ge351$. The count guarantees rank $r$, not the
+margin, which is checked on the result.
+
+Write
+\[
+ \langle X,Y\rangle_{\Phi_q}=\tr(X^{\top}K_0^{-1}Y\Phi_q),\qquad
+ \mathcal L(T)=K_0T-M_0T\Omega^2,\qquad
+ J_F=\frac{\langle\mathcal L(T),\mathcal L(T)\rangle_{\Phi_q}}{\tr(\Omega^2\Phi_q)},
+\]
+a convex quadratic in $T$. Let $\mathcal D=\{D:AD=0,\ d_j\in\mathcal U\}$ be
+the directions that keep the ports.
+
+\begin{theorem}[Completion]\label{thm:completion}
+Let $M_0,K_0\succ0$, $\Phi_q\succeq0$, $\omega_j>0$ and $\delta>0$.
+\begin{enumerate}
+\item[(i)] Every feasible $T$ of Eq.~\eqref{eq:completion-problem} has rank
+$r$ and satisfies Eq.~\eqref{eq:completion-left-inverse}.
+\item[(ii)] Without the margin a minimizer $T_{\rm LS}$ exists. A member $T$
+of $\mathcal T(\theta)$ with columns in $\mathcal U$ is one if and only if
+$\langle\mathcal L(T),\mathcal L(D)\rangle_{\Phi_q}=0$ for every
+$D\in\mathcal D$.
+\item[(iii)] Every such member satisfies
+$J_F(\theta,T)=J_F(\theta,T_{\rm LS})
++\langle\mathcal L(T-T_{\rm LS}),\mathcal L(T-T_{\rm LS})\rangle_{\Phi_q}/\tr(\Omega^2\Phi_q)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) The margin gives $\|RTv\|_2\ge\delta\|v\|_2$, so $RT$ has full column
+rank, $(RT)^{\dagger}RT=I_r$, and $\|V\|_2=1/\sigma_r(RT)\le1/\delta$
+because the rows of $R$ are orthonormal.
+
+(ii) The admissible set is the nonempty affine set $T_1+\mathcal D$. On it
+$J_F$ is a convex quadratic bounded below by zero, so a minimizer exists.
+A convex quadratic is minimal at $T$ exactly when its directional
+derivative $2\langle\mathcal L(T),\mathcal L(D)\rangle_{\Phi_q}/\tr(\Omega^2\Phi_q)$
+vanishes for every admissible direction $D$.
+
+(iii) $T-T_{\rm LS}\in\mathcal D$ and $\mathcal L$ is linear. Expanding
+$\mathcal L(T)=\mathcal L(T_{\rm LS})+\mathcal L(T-T_{\rm LS})$, the cross
+term vanishes by (ii).
+\end{proof}
+
+So $T_{\rm LS}$ solves Eq.~\eqref{eq:completion-problem} whenever it meets
+the margin. Otherwise, by (iii), the problem asks for the independent map
+closest to $T_{\rm LS}$ in the seminorm of $\mathcal L$. The margin makes it
+nonconvex. We start from $T_{\rm LS}$ with its small singular values raised
+to the margin and run an alternating-direction iteration that keeps $AT=W$
+in every iterate (Appendix~\ref{sec:constrained}). The accepted map is the
+best feasible iterate. Its value bounds the optimum,
+$J_F(\theta,T_{\rm LS})\le J_F^\star\le J_F(\theta,T)$, so the gap to
+$J_F(\theta,T_{\rm LS})$ certifies how much the margin costs.

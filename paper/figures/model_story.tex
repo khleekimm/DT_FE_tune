@@ -1,0 +1,51 @@
+% Figure 1: the accelerance composed through the FE space (top) and the port space (bottom).
+% Blue maps are fitted from the FRFs, orange maps are completed with the nominal
+% model, black maps are the fixed registration. Plain TikZ coordinates keep every
+% label clear of every arrow.
+\begin{tikzpicture}[x=1cm,y=1cm,>=stealth,
+ sp/.style={align=center,inner sep=2pt,font=\small},
+ lab/.style={font=\footnotesize,inner sep=1.5pt},
+ fit/.style={->,thick,draw=blue!70!black},
+ cmp/.style={->,thick,draw=orange!80!black},
+ reg/.style={->,draw=black!75}]
+ \newcommand{\spname}[2]{$#1$\\[-2pt]{\scriptsize\color{black!60}#2}}
+ % nodes: forces -> FE load / port forces -> modal force -> modal displacement
+ %        -> FE displacement / port displacement -> accelerations
+ \node[sp] (f)  at (0,0)       {\spname{f\in\C^{p}}{measured forces}};
+ \node[sp] (Bf) at (2.7,1.45) {\spname{Bf\in\C^{n}}{FE load}};
+ \node[sp] (Rf) at (2.7,-1.45){\spname{R_{\rm i}^{\top}f\in\C^{h}}{port forces}};
+ \node[sp] (g)  at (5.35,0)    {\spname{g\in\C^{r}}{modal force}};
+ \node[sp] (q)  at (8.55,0)    {\spname{q\in\C^{r}}{modal displacement}};
+ \node[sp] (u)  at (11.3,1.45) {\spname{u=T_\theta q\in\C^{n}}{FE displacement}};
+ \node[sp] (y)  at (11.3,-1.45){\spname{y=Wq\in\C^{h}}{port displacement}};
+ \node[sp] (a)  at (14.0,0)    {\spname{a/s^{2}\in\C^{m}}{accelerations}};
+ % registration (black)
+ \draw[reg] (f) -- node[lab,above left]{$B$} (Bf);
+ \draw[reg] (f) -- node[lab,below left]{$R_{\rm i}^{\top}$} (Rf);
+ \draw[reg] (Rf) -- node[lab,right]{$A^{\top}$} (Bf);
+ \draw[reg] (u) -- node[lab,left]{$A$} (y);
+ \draw[reg] (u) -- node[lab,above right]{$S$} (a);
+ \draw[reg] (y) -- node[lab,below right]{$R_{\rm o}$} (a);
+ % completed (orange) and fitted (blue)
+ \draw[cmp] (Bf) -- node[lab,above right]{$T_\theta^{\top}$} (g);
+ \draw[fit] (Rf) -- node[lab,below right]{$W^{\top}$} (g);
+ \draw[fit] (g) -- node[lab,above]{$\Delta_\theta(s)^{-1}$} (q);
+ \draw[cmp] (q) -- node[lab,above left]{$T_\theta$} (u);
+ \draw[fit] (q) -- node[lab,below left]{$W$} (y);
+ % Completion of the orange maps: three conditions on T_theta.
+ \node[draw=orange!80!black,rounded corners=2pt,fill=orange!4,inner sep=3pt]
+  (cmp) at (7.0,2.75)
+ {\small\begin{tabular}{@{}c@{\hspace{2.2em}}c@{\hspace{2.2em}}c@{}}
+  $AT_\theta=W$ & $\rank T_\theta=r$ & $(M_0^{-1}K_0)\,T_\theta\approx T_\theta\Omega^2$\\[-1pt]
+  {\scriptsize\color{black!60}port rows kept} &
+  {\scriptsize\color{black!60}every modal coordinate kept} &
+  {\scriptsize\color{black!60}nominal undamped dynamics}
+ \end{tabular}};
+ \node[font=\scriptsize,text=orange!80!black,anchor=south west,inner sep=1pt]
+  at ([xshift=2pt]cmp.north west) {completion of the orange maps};
+ % legend
+ \node[font=\scriptsize] at (7.0,-2.45)
+ {\tikz[baseline=-0.6ex]\draw[fit](0,0)--(0.5,0); fitted from the FRFs\quad
+  \tikz[baseline=-0.6ex]\draw[cmp](0,0)--(0.5,0); completed with $(M_0,K_0)$\quad
+  \tikz[baseline=-0.6ex]\draw[reg](0,0)--(0.5,0); registration: $B=A^{\top}R_{\rm i}^{\top}$, $S=R_{\rm o}A$};
+\end{tikzpicture}

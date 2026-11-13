@@ -1,0 +1,385 @@
+\section{Numerical implementation}\label{sec:numerics}
+\subsection{Scales, penalty and conditional least squares}\label{sec:fit-details}
+The scale of transfer $(o,i)$ in Eq.~\eqref{eq:objective} is
+\[
+ d_{oi}=\max\Bigl\{\rho_{oi},\ 10^{-3}\operatorname{median}_{o,i}\rho_{oi},\
+ 10^{-12}\ \mathrm{m\,s^{-2}/N}\Bigr\},\qquad
+ \rho_{oi}=\Bigl(N^{-1}\sum_{\ell}|\widehat H_{\ell,oi}|^{2}\Bigr)^{1/2},
+\]
+computed once on the training record and frozen for every later record.
+For the penalty, let $E_{\rm g}$ be the geometric extension of the $h$ port
+directions over the displayed mesh, built by minimum-roughness interpolation
+and corrected to reproduce five rigid patterns in the laboratory, and
+let $Q_{\rm g}\succeq0$ be the surface-gradient roughness operator assembled
+from the mesh connectivity; the chain uses first differences along the chain.
+Then $G=E_{\rm g}^{\top}Q_{\rm g}E_{\rm g}/\|E_{\rm g}^{\top}Q_{\rm g}E_{\rm g}\|_2$
+and $\beta=\alpha/(r\chi_0^{2})$ with $\chi_0^{2}=\operatorname{median}_{o,i}d_{oi}$
+and $\alpha=10^{-5}$ in both examples. A zero roughness gives a zero penalty.
+Here $\|\cdot\|_2$ is the Euclidean vector norm or the spectral matrix norm
+and $\|\cdot\|_F$ the Frobenius norm.
+For disjoint ports the scaling
+$(R_{\rm o}W,R_{\rm i}W)\mapsto(c^{-1}R_{\rm o}W,cR_{\rm i}W)$ with $c>0$
+leaves $H_\theta$ unchanged. The penalty balances this reciprocal scale.
+
+For disjoint ports and fixed $(R_{\rm i}W,\omega,\Gamma)$, $H_\theta(s_\ell)=R_{\rm o}WD_\ell$ with
+$D_\ell=s_\ell^{2}\Delta_\theta(s_\ell)^{-1}W^{\top}R_{\rm i}^{\top}$, so the response
+rows minimize a real linear least-squares objective: the real and imaginary
+parts of $(R_{\rm o}WD_\ell-\widehat H_\ell)_{oi}/d_{oi}$, stacked over $\ell$ and $i$,
+plus the quadratic penalty, whose blocks couple response rows with each other
+and with the fixed force rows. Writing $G=\Xi^{\top}\Xi$ turns the penalty
+into augmented residual rows; QR compression of the frequency equations and a
+right-preconditioned LSMR solve then avoid assembling the coupled normal matrix.
+Variable projection \citep{golub2003,oleary2013} thus eliminates the response
+rows.
+
+The nonlinear derivatives use $d(\Delta^{-1})=-\Delta^{-1}(d\Delta)\Delta^{-1}$
+and the envelope property of the conditional minimum \citep{golub2003,oleary2013}.
+Positivity is built into the parameterization,
+\begin{equation}
+ \omega_j=\omega_{\rm ref}\exp(\vartheta_j),\qquad
+ \Gamma=\omega_{\rm ref}(\Upsilon\Upsilon^{\top}+10^{-7}I_r),\qquad
+ \Upsilon_{jj}=\exp(\gamma_{jj}),\quad
+ \Upsilon_{jk}=\gamma_{jk}\ (0<j-k\le b),
+ \label{eq:positive}
+\end{equation}
+with $\omega_{\rm ref}=2\pi\max_\ell\nu_\ell$, all other entries of the lower
+triangular $\Upsilon$ zero, and $b$ the bandwidth in optimizer order. The
+real variables $\vartheta_j,\gamma_{jk}$ and the force rows $R_{\rm i}W$ are
+updated by L-BFGS-B \citep{byrd1995} within
+$2\pi\max(0.05\min_\ell\nu_\ell,0.001\ \mathrm{Hz})\le\omega_j\le3\omega_{\rm ref}$,
+factor diagonals in $[10^{-5},2]$ and off-diagonals in $[-2,2]$. The chain
+uses $b=2$ (a full factor) and the laboratory $b=24$. Exported frequency
+orderings permute $W,\Omega^{2},\Gamma$ together and are undone before
+completion. The laboratory continuation started from 13.40\% training and
+16.10\% development error. Directional reduced-gradient checks at two
+laboratory states gave relative differences $3.17\times10^{-7}$ and
+$1.24\times10^{-8}$. The order $r$ and the bandwidth $b$ are fixed before
+fitting. The pole expansion in Eq.~\eqref{eq:poleresidue} makes each
+evaluation linear in $N$. Hereafter $\theta$ denotes the returned fitted
+parameters. No global optimality is claimed, and the examples report the
+stopping diagnostics.
+
+\subsection{Selecting the hidden fields with sparse solves}\label{sec:field-selection}
+The laboratory trial space $\mathcal U$ has two parts. The first holds the
+static deflections $X=K_0^{-1}A^{\top}$ under unit port forces. Their port
+values form the port flexibility $AX=AK_0^{-1}A^{\top}$, which is positive
+definite because $A$ has full row rank. Recombining the deflections to unit
+port values gives the static lift
+\begin{equation}
+ E=K_0^{-1}A^{\top}(AK_0^{-1}A^{\top})^{-1},\qquad AE=I_h.
+ \label{eq:lift}
+\end{equation}
+Its column $Ew$ is the field of least strain energy with port values $w$.
+Since $K_0E=A^{\top}(AX)^{-1}$, every $v\in\ker A$ has
+$E^{\top}K_0v=(AX)^{-1}Av=0$. Every $t$ with $At=w$ is $t=Ew+v$ with
+$v\in\ker A$, and then $\|t\|_{K_0}^2=\|Ew\|_{K_0}^2+\|v\|_{K_0}^2$.
+The second part holds $d$ port-invisible fields $N$, selected below and
+normalized by
+\begin{equation}
+ AN=0,\qquad N^{\top}M_0N=I_d.
+ \label{eq:hidden}
+\end{equation}
+Every candidate map in $\mathcal U$ then reads
+\begin{equation}
+ T=EW+NZ,\qquad Z\in\R^{d\times r},
+ \label{eq:completion}
+\end{equation}
+and satisfies $AT=W$ for every $Z$. This form is only a computational
+device. Theorem~\ref{thm:completion} does not depend on it. A change of
+basis of the fields with the inverse change of $Z$ leaves $T$ unchanged.
+The static map
+$EW$ also sets the margin $\delta=10^{-3}\sigma_1(REW)$.
+
+Here $R\in\R^{n_{\rm d}\times n}$ selects the $n_{\rm d}=7988$ displayed
+translations. Let $M_{\rm d}$ be the positive diagonal of $M_0$ on those coordinates, and set
+$D_{\rm d}=M_{\rm d}^{1/2}$. The laboratory prior assumes static equilibrium in
+the omitted coordinates. Among fields satisfying that assumption and
+$Au=0$, the retained directions have the smallest values of
+\[
+ \frac{u^{\top}K_0u}{(Ru)^{\top}M_{\rm d}(Ru)}.
+\]
+This selects mechanically compliant invisible fields. A generic null-space
+SVD enforces $Au=0$, but supplies no such stiffness ordering.
+
+The selection requires neither a dense null-space basis nor a condensed
+stiffness. Factor $K_0$ once and compute
+\[
+ K_0X=A^{\top},\qquad G_A=AX,\qquad EG_A=X.
+\]
+The last equation is a solve with the $h\times h$ constraint matrix.
+The projection $\mathcal Pv=v-E(Av)$ removes registered motion. It is applied
+without forming $\mathcal P=I-EA$. Define the symmetric positive semidefinite
+selection operator by
+\begin{equation}
+ \boxed{\quad K_0w=R^{\top}D_{\rm d}v,\qquad
+ \mathcal Hv=D_{\rm d}R\bigl(w-E(Aw)\bigr).\quad}
+ \label{eq:selection-action}
+\end{equation}
+Its largest positive eigenpairs $\mathcal Hy_k=\mu_ky_k$ correspond to the
+smallest stiffness-selection eigenvalues $\varpi_k=1/\mu_k$.
+These are eigenvalues of the statically relaxed, displayed-metric problem.
+Their square roots are not the full FE model's natural frequencies.
+Appendix~\ref{sec:field-details} derives this equivalence.
+
+The same solves recover each full field:
+\begin{equation}
+ \widetilde n_k=\frac1{\mu_k}
+ (K_0^{-1}-EAK_0^{-1})R^{\top}D_{\rm d}y_k,
+ \qquad A\widetilde n_k=0,\quad
+ R\widetilde n_k=D_{\rm d}^{-1}y_k.
+ \label{eq:field-recovery}
+\end{equation}
+Because $A$ has support only on displayed translations, the right-hand
+side of $K_0\widetilde n_k$ vanishes on omitted coordinates. Thus the
+recovered field satisfies their static equilibrium, without a second
+factorization. Keep complete clusters at the retention boundary.
+For the resulting $\widetilde N$, only the small retained Gram matrix is
+normalized:
+\begin{equation}
+ G_N=\widetilde N^{\top}M_0\widetilde N=LL^{\top},\qquad
+ N=\widetilde NL^{-\top}.
+ \label{eq:retained-normalization}
+\end{equation}
+Here $L$ is lower triangular. Selection uses $M_{\rm d}$. Normalization uses
+the full $M_0$, including the recovered coordinates. Substituting a condensed
+mass or selecting full-mass modes would choose a different approximation
+space. Triangular normalization and a subsequent orthogonal rotation only
+change coordinates within the selected space.
+
+The completion runs as follows.
+\begin{enumerate}
+\item Supply $K_0,M_0,A,R,M_{\rm d}$, the fitted $(W,\omega,\Gamma)$,
+the retained-field and boundary-cluster rule and the independence margin.
+\item Factor $K_0$ once. Solve for $X=K_0^{-1}A^{\top}$ and factor
+$G_A=AX$ to construct $E$. Verify $AE=I_h$.
+\item Apply $\mathcal H$ by Eq.~\eqref{eq:selection-action}, using the same
+stiffness factor and the small constraint correction.
+\item Compute only the required largest positive eigenpairs, with extra
+pairs to detect a cutoff cluster in $\varpi=1/\mu$.
+\item Recover the full $\widetilde N$ by Eq.~\eqref{eq:field-recovery} in
+bounded batches. Check its ports, displayed fields and omitted equilibrium.
+\item Factor the retained mass Gram to obtain $N$. Verify
+$AN=0$ and $N^{\top}M_0N=I_d$.
+\item Project $K_0$, $M_0$ and $M_0K_0^{-1}M_0$ onto $[E,N]$, solve the
+equality-only problem of Appendix~\ref{sec:constrained} and check $\sigma_r(RT)$. If the margin fails,
+run the constrained iteration and report its feasibility and stopping
+residuals. In either case verify $AT=W$.
+\end{enumerate}
+
+\subsection{Static condensation and the hidden fields}\label{sec:field-details}
+In the laboratory the hidden fields are built on the displayed translations
+and condensed over the rest. Write $u_{\rm d}=Ru$ for the displayed
+translations and let $u_{\rm o}$ collect the omitted translations and
+rotations. In the order $(u_{\rm d},u_{\rm o})$ write the blocks of $K_0$ as
+$K_{\rm dd},K_{\rm do},K_{\rm od},K_{\rm oo}$ with $K_{\rm do}=K_{\rm od}^{\top}$.
+Completing the block square,
+\begin{equation}
+ u^{\top}K_0u=u_{\rm d}^{\top}
+ (K_{\rm dd}-K_{\rm do}K_{\rm oo}^{-1}K_{\rm od})u_{\rm d}
+ +(u_{\rm o}+K_{\rm oo}^{-1}K_{\rm od}u_{\rm d})^{\top}K_{\rm oo}
+ (u_{\rm o}+K_{\rm oo}^{-1}K_{\rm od}u_{\rm d}),
+ \label{eq:block-square}
+\end{equation}
+so for given $u_{\rm d}$ the energy is least at
+$u_{\rm o}=-K_{\rm oo}^{-1}K_{\rm od}u_{\rm d}$. The corresponding static lift
+\begin{equation}
+ u=\Lambda u_{\rm d},\qquad R\Lambda=I,\qquad
+ \Lambda=\begin{bmatrix}I\\-K_{\rm oo}^{-1}K_{\rm od}\end{bmatrix}_{(\rm d,o)}
+ \label{eq:static-lift}
+\end{equation}
+is a right inverse of $R$: the static expansion underlying Guyan reduction
+\citep{guyan1965}. Its image minimizes elastic energy at fixed displayed
+translations.
+The condensed stiffness is $\Lambda^{\top}K_0\Lambda$, the Schur complement in
+Eq.~\eqref{eq:block-square}, and the registration on displayed coordinates is
+$A\Lambda$. Since the ports involve only displayed translations, the lift $E$
+of Eq.~\eqref{eq:lift} also lies in $\range\Lambda$.
+
+The selection metric $M_{\rm d}=\diag((M_0)_{\rm dd})$ is neither the
+condensed mass $\Lambda^{\top}M_0\Lambda$ nor a full modal problem. Let
+$U_A$ be any basis of $\ker(A\Lambda)$ with independent columns. An
+anchor-invisible displayed field is then $U_Av$. With
+$K_N=U_A^{\top}\Lambda^{\top}K_0\Lambda U_A$ and $M_N=U_A^{\top}M_{\rm d}U_A$,
+both positive definite, the field problem is the symmetric generalized
+eigenproblem
+\begin{equation}
+ K_Nv_k=\varpi_kM_Nv_k,\qquad v_i^{\top}M_Nv_j=\delta_{ij},\qquad
+ \widetilde n_k=\Lambda U_Av_k,
+ \label{eq:fe-fields}
+\end{equation}
+with mass-orthonormal reduced coordinates $v_k$ in this explicit
+representation. The smallest selection
+eigenvalues $\varpi_k$ minimize stiffness relative to $M_{\rm d}$. Their
+square roots need not equal natural frequencies of the full FE model. The
+implementation never forms $U_A$ or a condensed matrix. The constrained
+inverse $U_AK_N^{-1}U_A^{\top}=R(K_0^{-1}-EAK_0^{-1})R^{\top}$ is applied
+through sparse solves with $K_0$, scaled on both sides by $M_{\rm d}^{1/2}$,
+and its largest eigenvalues $1/\varpi_k$ are computed by a Lanczos iteration.
+The Euclidean-orthonormal eigenvectors of Eq.~\eqref{eq:selection-action}
+are $y_k=M_{\rm d}^{1/2}U_Av_k$. Both representations describe the same fields.
+
+To see the inverse identity directly, for a displayed load $f$ set
+$u=(K_0^{-1}-EAK_0^{-1})R^{\top}f$. Then $Au=0$ and
+$K_0u=R^{\top}f-A^{\top}G_A^{-1}AK_0^{-1}R^{\top}f$.
+The omitted rows have zero right-hand side, hence $u=\Lambda Ru$.
+Testing against $\Lambda U_A$ gives $K_Nv=U_A^{\top}f$ for $Ru=U_Av$,
+which proves the displayed constrained-inverse formula. In particular,
+$K_0^{-1}-EAK_0^{-1}$ is symmetric even though $I-EA$ is generally not
+Euclidean-orthogonal. It is the $K_0$-orthogonal projection followed by
+the elastic solve.
+
+Initially $d=\min(r,\dim\ker(A\Lambda))$ fields are retained, with complete
+boundary clusters added when adjacent $\varpi_k$ differ by at most
+$10^{-8}\max(1,|\varpi_k|)$ in SI units. The selected fields are recovered
+by Eq.~\eqref{eq:field-recovery}, which applies $\Lambda$ implicitly with
+the full stiffness factor, and projected by $I_n-EA$ to remove roundoff
+anchor components. The retained-Gram Cholesky factor in
+Eq.~\eqref{eq:retained-normalization} then normalizes them in the full mass.
+A Rayleigh--Ritz rotation
+diagonalizes $N^{\top}K_0N$ within the fixed span and the largest-magnitude
+entry fixes each column's sign. This preserves the selected span and gives
+Eq.~\eqref{eq:hidden}. It does not turn the selection into a full-$M_0$
+eigenproblem. The chain, with
+$n<100$, uses the dense null space of $A$ directly.
+
+The sparse implementation uses equilibrated SuperLU factors and two
+residual-refinement steps per elastic solve. The partial symmetric
+eigensolver uses tolerance $10^{-10}$, the deterministic start
+$v_i=\sin(i\sqrt2)$, and initially requests eight extra eigenpairs.
+The request grows if the complete boundary cluster has not yet been
+bracketed. A nonconverged eigensolve is rejected explicitly and never
+returns a partial dictionary. Recovery and projected dual-energy
+solves use at most 32 right-hand sides per batch. The retained Gram is
+checked for numerical rank before normalization. A full-rank spectral
+factor is available if Cholesky fails. No ridge or field deletion hides rank
+loss. The final Ritz rotation is retained for its small
+cost, stiffness ordering and diagonal hidden stiffness block. It does not
+diagonalize the mass and dual-energy cross blocks with $E$.
+
+The stiffness factor depends only on $K_0$. A change in $A$ recomputes its
+small constraint factor and $E$. A change in $R,M_{\rm d},d$ or the cutoff
+rule invalidates field selection. Full $M_0$ also determines normalization
+and projected operators. Fitted $W,\omega,\Gamma$ do not invalidate the
+dictionary unless the specified field count changes. Cached files contain
+content signatures of the nominal matrices, registration, displayed rows
+and selection rules. In-memory contexts own their inputs and reject a
+changed stiffness instead of reusing a stale factor.
+
+\paragraph{What an SVD alternative would change.}
+Write $A_{\rm d}=AR^{\top}$. If its nonzero-column support has size $s$, a
+column permutation $\Pi_s$ gives $A_{\rm d}\Pi_s=[A_s\;0]$. A small SVD can
+compute $V_s=\operatorname{null}(A_s)$ and represent the displayed null
+space as
+\[
+ U_A=\Pi_s\begin{bmatrix}V_s&0\\0&I_{n_{\rm d}-s}\end{bmatrix}.
+\]
+This representation need never be materialized. The identity block acts
+directly on unsupported coordinates. It enforces the same interpolated
+ports but still needs the mechanical selection problem.
+Alternatively, a full-column-rank nominal candidate matrix
+$\Phi\in\R^{n\times n_\Phi}$ gives $N=\Phi\operatorname{null}(A\Phi)$ and
+\[
+ \range N=\range\Phi\cap\ker A,\qquad
+ d=n_\Phi-\rank(A\Phi).
+\]
+Thus $n_\Phi=417$ yields $d=384$ only if $\rank(A\Phi)=33$. This is a
+different approximation space. The dimension count alone neither
+demonstrates spatial accuracy nor preserves the static assumption. This
+paper uses neither candidate modes nor response-based enrichment.
+
+\subsection{Equality-only least squares and constrained refinement}\label{sec:constrained}
+In the basis $[E,N]$ only three small matrices are assembled:
+$\widehat K=[E,N]^{\top}K_0[E,N]$, $\widehat M=[E,N]^{\top}M_0[E,N]$ and
+$\widehat H=[E,N]^{\top}M_0K_0^{-1}M_0[E,N]$, the last with the reused
+sparse stiffness factor. For $T=[E,N]X$ with $X=[W;Z]$,
+\[
+ \tr(G^{\top}K_0^{-1}G\Phi_q)=\tr(X^{\top}\widehat KX\Phi_q)
+ -\tr\bigl(X^{\top}\widehat MX(\Omega^2\Phi_q+\Phi_q\Omega^2)\bigr)
+ +\tr(X^{\top}\widehat HX\,\Omega^2\Phi_q\Omega^2),
+\]
+which is the full compliance-weighted FE residual, not a residual first
+projected into the trial space. Its stationarity in $Z$ is the coupled
+linear system of Theorem~\ref{thm:completion}(ii),
+\begin{equation}
+ \widehat K_{NN}Z\Phi_q-\widehat M_{NN}Z(\Omega^2\Phi_q+\Phi_q\Omega^2)
+ +\widehat H_{NN}Z\,\Omega^2\Phi_q\Omega^2=-C,
+ \label{eq:coefficient-solve}
+\end{equation}
+where the subscript $NN$ marks the hidden block and $C$ collects the same
+three terms with the port block $[E]W$. Conjugate gradients solve it with
+a block-diagonal preconditioner: column $j$ uses the inverse of
+$(\Phi_q)_{jj}(\widehat K_{NN}-2\omega_j^2\widehat M_{NN}+\omega_j^4\widehat H_{NN})$,
+the part of the operator that does not couple modes. With
+$\Phi_q=\Omega^{-2}$ the system decouples and reproduces the earlier
+per-mode undamped solution to $5\times10^{-12}$. For the shell the
+equality-only solve reaches a relative residual below $10^{-11}$, and the
+full-residual and projected values of $J_F$ agree to
+\LabProjectionAgreement.
+
+A thin QR factorization $R[E,N]=U_D[V_E,V_N]$ with $U_D^{\top}U_D=I$ gives
+$X(Z)=V_EW+V_NZ$ with the singular values of $RT$. Introduce an auxiliary
+$Y=X(Z)$ with $\sigma_r(Y)\ge\delta_{\rm g}=1.001\delta$ and a scaled
+multiplier $U$. The alternating-direction updates \citep{boyd2011} are
+\begin{align}
+ \mathcal Q(Z^{k+1})+\rho V_N^{\top}V_NZ^{k+1}
+   &=-C+\rho V_N^{\top}(Y^k-U^k-V_EW),\nonumber\\
+ Y^{k+1}&=\mathcal P_{\delta_{\rm g}}(X(Z^{k+1})+U^k),\qquad
+ U^{k+1}=U^k+X(Z^{k+1})-Y^{k+1},
+ \label{eq:admm}
+\end{align}
+where $\mathcal Q$ is the left side of Eq.~\eqref{eq:coefficient-solve}
+and $\mathcal P_{\delta_{\rm g}}$ raises every singular value below
+$\delta_{\rm g}$ to $\delta_{\rm g}$. The $Z$ step is the same
+preconditioned system, warm started. The physical iterates remain
+$T=EW+NZ$, so $AT=W$ holds throughout, and only an actual $X(Z)$ with
+$\sigma_r\ge\delta$ is kept as a feasible candidate.
+
+The start is $T_{\rm LS}$ with the singular values of $X(Z_{\rm LS})$
+raised to $1.02\delta$ and mapped back to $Z$ by least squares. The penalty
+starts at the median of the diagonal blocks' traces divided by
+$\tr(V_N^{\top}V_N)$; every 25 iterations it doubles if the relative primal
+residual $\|X-Y\|_F/\max(\|X\|_F,1)$ exceeds $10^{-5}$ and halves if the
+scaled dual residual exceeds ten times the primal one. Both residuals have
+tolerance $2\times10^{-7}$ and the budget is 1200 iterations. The
+constraint is nonconvex, so convergence of the residuals does not prove
+global optimality. No stopping decision uses excluded responses.
+
+An accepted map must pass four numerical tests: aggregate and per-column
+port mismatch below $10^{-10}$ relative, $\|VT-I_r\|_F<10^{-9}$, actual
+$\sigma_r(RT)\ge\delta$, and numerical rank $r$ against
+$10^{-10}\sigma_1$. The guards $\kappa_2(RT)<10^5$ and $\kappa_2(P)<10^6$
+are inactive in both examples.
+
+\subsection{Comparison with the undamped criterion}\label{sec:completion-benchmark}
+The undamped criterion of free vibration replaces $\Phi_q$ by $\Omega^{-2}$.
+Completed with it in the same trial space and under the same margin, the
+shell map has $J_F=\LabJFOfJZero$ against \LabJF\ for the accepted map, and
+the two maps differ by \LabMapChange\% in relative Frobenius norm. Its
+excluded-response error is \LabExcludedErrorJZero\% against
+\LabExcludedError\%. For the chain the two maps differ by \SpringMapChange\%.
+
+\subsection{Coordinate selection and state-space outputs}\label{sec:state-details}
+For the square form of Theorem~\ref{thm:realization}(iii), the rows of $\Pi$
+are selected by column-pivoted QR of $(RT_\theta)^{\top}$ followed by
+determinant-increasing row exchanges with expansion-coefficient threshold
+1.05 \citep{golub2013}, with $B_\theta=L^{\top}B$ and $S_\theta=SL$. With state
+$\xi=[x^{\top},\dot x^{\top}]^{\top}\in\R^{2r}$,
+\begin{equation}
+ \dot\xi=\underbrace{\begin{bmatrix}0&I_r\\-M_\theta^{-1}K_\theta&-M_\theta^{-1}C_\theta\end{bmatrix}}_{A_{\rm s}}\xi
+ +\underbrace{\begin{bmatrix}0\\M_\theta^{-1}B_\theta\end{bmatrix}}_{B_{\rm s}}f,
+ \label{eq:state}
+\end{equation}
+with displacement and velocity outputs $[S_\theta,0]\xi$ and $[0,S_\theta]\xi$.
+Substituting the physical equation into the acceleration gives
+\begin{equation}
+ a=-S_\theta[\,M_\theta^{-1}K_\theta,\ M_\theta^{-1}C_\theta\,]\xi
+   +S_\theta M_\theta^{-1}B_\theta f,\qquad
+ S_\theta M_\theta^{-1}B_\theta=R_{\rm o}WW^{\top}R_{\rm i}^{\top}
+ =\lim_{|s|\to\infty}H_\theta(s).
+ \label{eq:feedthrough}
+\end{equation}
+The acceleration feedthrough is essential and is checked separately.
+Numerical implementations use solves or congruent products rather than an
+explicit $M_\theta^{-1}$. A new load column $B'$ or output row $S'$ enters
+through $L^{\top}B'$ or $S'L$, which reproduces Theorem~\ref{thm:realization}(ii)
+because $LP=T_\theta$.

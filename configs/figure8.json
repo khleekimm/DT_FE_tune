@@ -1,0 +1,11 @@
+{
+  "study": "artifacts/spatial_holdout_forced",
+  "trial": "hold_35_40",
+  "channels": [
+    35,
+    40
+  ],
+  "record": "test_103",
+  "selection_record": "test_101",
+  "role": "Exploratory spatial holdout display from a separate refit excluding ACC8, ACC35 and ACC40, completed with J_F. The pair was selected for response-level agreement on record 101 among three holdout trials."
+}

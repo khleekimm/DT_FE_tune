@@ -1,0 +1,50 @@
+\section{Introduction}\label{sec:intro}
+A structure with $n$ finite-element (FE) degrees of freedom is measured at
+$h\ll n$ port directions. Its frequency-response functions (FRFs) determine
+a second-order model in $r$ modal coordinates with parameters
+$\theta=(W,\omega,\Gamma)$: undamped frequencies $\omega$, damping $\Gamma$
+and the rows $W$ of the modal matrix at the ports. Two facts organize the
+paper. First, the modal displacement $q$ follows from $\theta$ and the
+measured forces at every frequency, so the reduced-order response is
+observed in modal space however few the sensors. Second, the measurements fix
+only the port rows $W=AT$ of the modal matrix $T\in\R^{n\times r}$, and every
+completion of the other rows reproduces the measured FRFs exactly. The
+construction is therefore
+\[
+ \underbrace{\widehat H\longmapsto\theta=(W,\omega,\Gamma)}_{\text{fit at the ports}}
+ \quad\longmapsto\quad
+ \underbrace{T_\theta:\ AT_\theta=W}_{\text{complete away from them}}
+ \quad\longmapsto\quad
+ \underbrace{u=T_\theta q}_{\text{predict anywhere}},
+\]
+with a nominal FE model $(M_0,K_0)$ choosing the rows that no port sees.
+
+Completion keeps the port rows $AT=W$ and keeps all $r$ modal coordinates
+on the mesh. Among such maps it minimizes the residual of the nominal
+equation of motion, $F=ma$, along the motion that the fitted model, with
+its identified damping, performs under the measured forces. The completed
+map is a modal model on the whole mesh. Its $n-r$ unidentified
+directions are trivial modes of zero shape.
+The receptance of this model answers queries. A query asks for complex FRFs
+with phase over a band between known load and response locations, or for
+forces at known positions. This query map is the structural digital twin in the
+sense of \citet{grieves2017,wagg2020,kapteyn2021,chinesta2020}.
+
+Modal testing and frequency-domain identification supply the fitted models
+\citep{ewins2000,maia1997,peeters2004,pintelon2012,ljung1999}, and rational and
+structured realizations are treated by
+\citet{gustavsen1999,mayo2007,schulze2018,gosea2024}. FE updating changes
+nominal matrices to match measured modes
+\citep{baruch1978,berman1983,mottershead1993,friswell1995,ahmadian1998};
+expansion and virtual sensing extend measured responses through static,
+modal or filtered projections
+\citep{guyan1965,kidder1973,ocallahan1989,avitabile2012,avitabile2018,chen2019,papadimitriou2011,iliopoulos2016};
+hybrid models mix measured and numerical FRFs \citep{klaassen2018}. Here the
+measured transfers are never changed and the nominal matrices are never
+fitted: the prior selects only what the ports cannot see.
+
+Sections~\ref{sec:setting}--\ref{sec:realization} give the construction,
+Section~\ref{sec:spring} works it through for three masses, and
+Section~\ref{sec:lab} applies it to a laboratory shell. Numerical details
+and force estimation are in Appendices~\ref{sec:numerics}
+and~\ref{sec:forces}.

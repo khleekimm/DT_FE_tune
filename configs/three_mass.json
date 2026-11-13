@@ -1,0 +1,11 @@
+{
+  "schema": 1,
+  "name": "Three grounded masses: spatial completion and regularized scalar-FRF identification",
+  "parameters": {"mu_kg": 1.0, "k_N_per_m": 1000.0, "c_N_s_per_m": 2.0},
+  "geometry": {"positions": [0,1,2,3,4], "fixed_wall_indices": [0,4], "force_coordinate_one_based": 1, "response_coordinate_one_based": 3, "positive_direction": "right"},
+  "frequency_hz": {"start": 0.1, "stop": 12.0, "step": 0.005},
+  "noise": {"levels": [0.0,0.02], "training_seed": 20261031, "assessment_seed": 20261101, "complex_variance": "eta^2*(0.5*mean(abs(F_star)^2)+0.5*abs(F_star)^2)", "draws": "independent normal real/imaginary parts divided by sqrt(2)"},
+  "fit": {"r": 3, "b": 2, "primary_alpha": 1e-5, "alphas": [0,1e-6,1e-5,1e-4,1e-3,1e-2], "maxiter": 4000, "initialization": "production training-peak and common-denominator starts, matched probe budgets; no warm starts or reference parameters", "anchor_order": "force coordinate 1, response coordinate 3", "rigid_fields": [], "prior_selection": "declared grounded geometry; no leave-one-output-out procedure"},
+  "output": "artifacts/three_mass",
+  "assessment": "Independent 2% acquisition and noiseless truth, evaluated only after all twelve fits; alpha and budgets prespecified"
+}

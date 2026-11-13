@@ -1,0 +1,100 @@
+{
+  "primary_factors": "artifacts/robust_revision/selected_completion.npz",
+  "primary_fit": "artifacts/robust_revision/final_polish.npz",
+  "nominal_FE": "artifacts/fe_completion",
+  "FE_role": "Nominal rebuild of preserved shell element source; historical tuned full-precision state is unavailable.",
+  "extension": "Minimum K0 energy subject to full-FE registered anchors; no added rigid-pattern correction.",
+  "fields": "Constrained nominal elastic-energy modes of the represented translations after full-FE static relaxation of x translations and rotations. Use diagonal represented FE translational inertia to order fields; orthonormalize in full M0 afterward.",
+  "coefficient_objective": "J_F(T) = tr(G^T K0^-1 G Pi)/tr(Omega^2 Pi), G = K0 T - M0 T Omega^2, Pi = Re sum_l q_l q_l^H dnu, q_l = Delta(s_l)^-1 W_i^T f_l",
+  "eta": 0.0,
+  "rank_relative_tolerance": 1e-10,
+  "minimum_singular_value_relative_to_baseline_max": 0.001,
+  "maximum_completed_condition": 100000,
+  "maximum_selected_condition": 1000000,
+  "selection_rule": "Minimize the nominal F=ma residual of the lifted motion under the measured training forces, with the fitted damping, exact fixed port columns and a hard all-r-direction represented singular-value margin. Accept the feasible candidate with the smallest J_F over the declared deterministic starts; no excluded response selects parameters, space, threshold or stopping.",
+  "eigen_tolerance": 1e-10,
+  "cluster_tolerance": 1e-08,
+  "mass_normalization": "No exact prescribed-M0 constraint; report the actual projected FE mass and stiffness and their corrections.",
+  "spring_prior": "Deterministic imperfect nominal grounded chain; same topology and essential constraints as the generating system. M0,K0 enter only post-fit completion. C0 defines the nominal baseline FRF and is excluded from the completion criterion.",
+  "spring_nominal": {
+    "mass_kg": [
+      1.04,
+      0.97,
+      1.02
+    ],
+    "stiffness_N_per_m": [
+      1030.0,
+      960.0,
+      1050.0,
+      980.0
+    ],
+    "damping_Ns_per_m": [
+      1.92,
+      2.08,
+      2.04,
+      1.94
+    ],
+    "incidence": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        -1,
+        1,
+        0
+      ],
+      [
+        0,
+        -1,
+        1
+      ],
+      [
+        0,
+        0,
+        -1
+      ]
+    ],
+    "selection": "One specified perturbation; no response-based search or tuning. Physical order is masses 1,2,3; anchor order is force endpoint 1 then response endpoint 3."
+  },
+  "output": "artifacts/forced_completion",
+  "rank_solver": {
+    "max_iterations": 1200,
+    "tolerance": 2e-07,
+    "margin_guard": 1.001,
+    "initialization": "Archived feasible regularized completion mapped into the same physical affine family; equality-only solution is also a candidate.",
+    "reason": "Unconstrained FE residual minimization does not enforce an independent displacement basis.",
+    "adaptive_penalty": true
+  },
+  "admissible_space": "Full FE fields satisfying K_oo u_o + K_oy u_y=0; R H=I; no omitted coordinate is clamped. Both mechanical energies use H-expanded full fields.",
+  "port_relative_tolerance": 1e-10,
+  "left_inverse_tolerance": 1e-09,
+  "baseline_eta_comparison": 0.01,
+  "threshold_sensitivity_factors": [
+    0.5,
+    1.0,
+    2.0
+  ],
+  "criterion": "forced",
+  "forced": {
+    "record": "test_96",
+    "band_hz": [
+      360.0,
+      1000.0
+    ],
+    "welch": {
+      "rate_hz": 8192.0,
+      "nperseg": 131072,
+      "noverlap": 65536,
+      "window": "hann"
+    },
+    "raw": "raw/august_2026/ship_mockup_timeseries_2026_08.h5",
+    "spring_force_spectrum": "unit one-sided force spectrum (1 N^2/Hz) on the fitted 0.1-12 Hz grid; the chain data are synthetic FRFs without a force record",
+    "starts": [
+      "equality-only J_F map with represented singular values raised to 1.02 delta"
+    ],
+    "rho_scale": 1.0,
+    "inner_tolerance": 1e-07
+  }
+}

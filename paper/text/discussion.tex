@@ -1,0 +1,26 @@
+\section{Discussion and conclusion}\label{sec:discussion}
+The fitted parameters $\theta$ observe the structure in modal space: poles,
+rank-one residues and the port rows of the modal matrix, and with them the
+modal displacement under the measured forces. The nominal model then embeds
+this fixed $r$-mode model in the mesh. The embedding keeps the measured
+ports exactly and every modal coordinate with a margin, and within these
+constraints it minimizes the nominal $F=ma$ residual along the measured,
+damped motion. The damping is never compared with the nominal model, which
+has none; it enters through the motion. The realized operators satisfy the
+fitted modal equations exactly, even where the nominal operators do not.
+
+The chain shows the mechanism. The fit fixes two endpoint rows, the
+completion fills the middle row, and the equality-only map already meets
+the margin. The laboratory shell shows the limits. The fitted transfers are
+preserved to roundoff, and the constrained iteration converges with a
+margin cost of \LabMarginCost\% in $J_F$. But $J_F$ constrains only the
+motion that the test produces. With two shakers, correlated modes leave
+combinations that the criterion barely sees. The completion gives them
+large amplitudes, and the excluded responses are predicted worse than with
+the undamped criterion: \LabExcludedError\% against
+\LabExcludedErrorJZero\%. These assessments selected neither the completion
+nor its margin. More independent inputs, or a weight that also covers the
+unexcited combinations, would constrain these directions. Forces at known
+positions are recovered with errors of the order of the port misfit. The
+saved factors, operators, spectra and source reproduce every calculation
+and figure.

@@ -1,0 +1,152 @@
+\section{The fitted model and its spatial map}\label{sec:setting}
+\subsection{Coordinates and ports}
+Let $u\in\R^n$ be the FE displacement vector after the essential constraints
+are imposed. Translations are in metres and rotations in radians. The
+physical equations relate input forces $f\in\R^p$ to measured accelerations
+$a\in\R^m$:
+\begin{equation}
+ M\ddot u+C\dot u+Ku=Bf,\qquad a=S\ddot u,
+ \label{eq:physical}
+\end{equation}
+where $B\in\R^{n\times p}$ applies the loads and $S\in\R^{m\times n}$ samples
+the responses. The true operators $M$, $C$ and $K$ are generally unknown. The
+nominal FE prior supplies $M_0,K_0\succ0$. The reduced model retains $r\le n$
+modal coordinates $q$ through the projection $u=Tq$ with $T\in\R^{n\times r}$
+and obeys
+\begin{equation}
+ \ddot q+\Gamma\dot q+\Omega^2q=T^{\top}Bf,\qquad
+ \Omega=\diag(\omega),\quad \omega_j>0,\quad\Gamma=\Gamma^{\top}\succ0.
+ \label{eq:latent}
+\end{equation}
+The modal force $T^{\top}Bf$ and the physical load deliver the same power
+$(Bf)^{\top}\dot u=(T^{\top}Bf)^{\top}\dot q$. A single matrix $T$ thus maps
+displacements and its transpose maps forces. The coordinates $q$ are the
+mass-normalized undamped modal coordinates of the fitted model. Its modal
+mass $I_r$ and modal stiffness $\Omega^2$ are diagonal and leave the modal
+damping matrix $\Gamma$ as the only coupling. These coordinates need not be
+modal for the prior because neither $T^{\top}M_0T=I_r$ nor
+$T^{\top}K_0T=\Omega^2$ is assumed. Translational rows of $T$ have units
+kg$^{-1/2}$ and $q$ has units kg$^{1/2}$\,m. Both $\omega$ and $\Gamma$ have
+units s$^{-1}$.
+
+Let the full-row-rank matrix $A\in\R^{h\times n}$ sample the $h$ independent
+directions of all registered ports (observers and force actuators). Fixed
+selectors $R_{\rm o}\in\R^{m\times h}$ and $R_{\rm i}\in\R^{p\times h}$ pick
+the response rows and the force rows of $A$:
+\begin{equation}
+ S=R_{\rm o}A,\qquad B^{\top}=R_{\rm i}A,\qquad W=AT.
+ \label{eq:registration}
+\end{equation}
+The matrix $W\in\R^{h\times r}$ is the modal matrix $T$ restricted to the
+ports. The selectors $R_{\rm o}$ and $R_{\rm i}$ pick disjoint rows of $A$ in
+the examples because no port there both applies a force and measures a
+response. But, in general, a port can do both, and then $R_{\rm o}$ and $R_{\rm i}$ share a row.
+
+\subsection{Fit at the ports, complete away from them}
+The model parameter is $\theta=(W,\omega,\Gamma)$: the port rows $W=AT$ of
+the modal matrix, the undamped natural frequencies $\omega$ and the modal
+damping $\Gamma$. Section~\ref{sec:identification} fits it to measured
+accelerances.
+
+Denote Laplace transforms by the argument $s$. With zero initial conditions
+each time derivative becomes a factor $s$, so Eq.~\eqref{eq:latent} and
+$a=S\ddot u=ST\ddot q$ become
+\begin{equation}
+ \Delta_\theta(s)q(s)=T^{\top}Bf(s),\qquad a(s)=s^2STq(s),\qquad
+ \Delta_\theta(s)=s^2I_r+s\Gamma+\Omega^2.
+ \label{eq:laplace}
+\end{equation}
+By Eq.~\eqref{eq:registration}, $T$ meets the measurement only at the ports:
+\begin{equation}
+ ST=R_{\rm o}AT=R_{\rm o}W,\qquad
+ T^{\top}B=(AT)^{\top}R_{\rm i}^{\top}=W^{\top}R_{\rm i}^{\top}.
+ \label{eq:ports-see}
+\end{equation}
+Substituting and solving for $q$ wherever $\Delta_\theta(s)$ is invertible,
+\begin{equation}
+ q(s)=\Delta_\theta(s)^{-1}W^{\top}R_{\rm i}^{\top}f(s),\qquad
+ a(s)=H_\theta(s)f(s),\qquad
+ H_\theta(s)=s^2R_{\rm o}W\Delta_\theta(s)^{-1}W^{\top}R_{\rm i}^{\top}.
+ \label{eq:model}
+\end{equation}
+At $s=\mathrm i2\pi\nu$ with frequency $\nu$ in Hz, $H_\theta$ is the
+accelerance FRF. It depends on $T$ only through $W$. So every $T$ with
+$AT=W$ reproduces it. The fitted $\theta$ thus gives $q$ from the measured
+forces. Only $T$ is left open, and it distributes $q$ over the mesh as
+$u=Tq$. Figure~\ref{fig:spaces} shows the two routes from $f$ to $a$.
+
+\begin{figure}[tb]\centering
+\input{figures/model_story}
+\caption{The accelerance $H_\theta(s)$ composed through the FE space (upper
+route) and through the port space (lower route). Both routes share the modal
+force $g=T_\theta^{\top}Bf=W^{\top}R_{\rm i}^{\top}f$ and the modal
+displacement $q$, and every cell commutes, since $AT_\theta=W$,
+$B=A^{\top}R_{\rm i}^{\top}$ and $S=R_{\rm o}A$. The FRFs determine the lower
+route and with it $q$. Completion supplies the upper route through
+$T_\theta$. It keeps the port rows and all $r$ modal coordinates. It minimizes the
+nominal $F=ma$ residual of $u=T_\theta q$ under the measured forces.}
+\label{fig:spaces}
+\end{figure}
+
+\subsection{Pole--residue form of the fit}
+The experiment measures the accelerance matrix
+$\widehat H_\ell\in\C^{m\times p}$ at $N$ frequency lines
+$s_\ell=\mathrm i2\pi\nu_\ell$. Each entry is a complex transfer from one
+force to one response. The fit uses all of them. It regresses the model
+$H_\theta(s_\ell)$ onto $\widehat H_\ell$ at every line.
+
+The regression parameters are the number of modes $r$ and the model
+parameter $\theta$. The order $r$ is set first. The laboratory example
+selects it by validation (Section~\ref{sec:lab}). The least squares then
+fits $\theta$ for that $r$.
+
+The poles $\lambda_k$ of the model are the $2r$ roots of
+$\det\Delta_\theta(\lambda)=0$. They depend on $\omega$ and $\Gamma$ only.
+We assume every root is simple: no two roots coincide. Each simple root then
+has one eigenvector direction. We take $\phi_k$ with
+$\Delta_\theta(\lambda_k)\phi_k=0$ and normalize it by
+$\phi_k^{\top}(2\lambda_kI_r+\Gamma)\phi_k=1$. Then $\Delta_\theta^{-1}$ is a
+sum of rank-one terms over the poles \citep{lancaster1966,tisseur2001}.
+Substituting it into Eq.~\eqref{eq:model} gives the form that the fit
+evaluates:
+\begin{equation}
+ \begin{aligned}
+ \Delta_\theta(s)^{-1}&=\sum_{k=1}^{2r}\frac{\phi_k\phi_k^{\top}}{s-\lambda_k},\\
+ H_\theta(s)&=R_{\rm o}WW^{\top}R_{\rm i}^{\top}
+ +\sum_{k=1}^{2r}\frac{\lambda_k^2(R_{\rm o}W\phi_k)(R_{\rm i}W\phi_k)^{\top}}{s-\lambda_k}.
+ \end{aligned}
+ \label{eq:poleresidue}
+\end{equation}
+The constant term is the acceleration feedthrough. All $mp$ transfers are
+built from the same $2r$ poles. At pole $\lambda_k$ the residue is the
+product of one column $\lambda_k^2R_{\rm o}W\phi_k$ over the responses and
+one row $(R_{\rm i}W\phi_k)^{\top}$ over the forces. So every measured
+transfer at every line constrains the same parameters $\omega$, $\Gamma$ and
+$W$.
+
+\subsection{Two steps}
+The unknowns are $\theta$ and the modal matrix $T$. They are linked by
+$AT=W$. The FRFs enter through a misfit $J(\theta)$ defined in
+Section~\ref{sec:identification}. The nominal model $(M_0,K_0)$ enters
+through a criterion $J_F(\theta,T)$ defined in Section~\ref{sec:completion}.
+A joint estimate would solve
+\begin{equation}
+ \min_{\theta,\,T}\ J(\theta)+\tau J_F(\theta,T)
+ \quad\text{subject to}\quad AT=W,\quad\rank T=r,\qquad\tau>0.
+ \label{eq:joint}
+\end{equation}
+The rank condition keeps all $r$ modal coordinates on the mesh. By
+Eqs.~\eqref{eq:ports-see} and \eqref{eq:model} the FRFs see $T$ only
+through $W$. So $J$ does not depend on the rest of $T$. For fixed $\theta$
+the best $T$ minimizes $J_F$ alone. It is the same for every $\tau$. The
+weight $\tau$ acts on $\theta$ only. It lets the nominal model pull $\theta$
+away from the measured FRFs. We give the data priority and let
+$\tau\to0^+$. The joint problem then splits into two steps:
+\begin{equation}
+ \text{(i)}\quad\min_\theta J(\theta),\qquad
+ \text{(ii)}\quad\min_{\substack{AT=W\\\rank T=r}}J_F(\theta,T)\ \text{ at the fitted }\theta.
+ \label{eq:two-steps}
+\end{equation}
+Step~(i) uses the ports alone (Section~\ref{sec:identification}). Step~(ii)
+uses the FE operators (Section~\ref{sec:completion}). It keeps $AT=W$, so it
+never changes the fitted transfers.

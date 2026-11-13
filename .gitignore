@@ -1,0 +1,77 @@
+# Whitelist: git tracks only the files the paper build reads and the
+# analysis code. Everything else (data, results, builds, venv, AI and editor
+# files, reports, audit tooling) stays local.
+/*
+!/.gitignore
+!/pyproject.toml
+!/requirements.txt
+!/src/
+!/tests/
+!/configs/
+!/scripts/
+!/paper/
+!/figures/
+
+# Paper: only the files that LaTeX reads
+/paper/*
+!/paper/main.tex
+!/paper/style.tex
+!/paper/refs.bib
+!/paper/text/
+!/paper/generated/
+!/paper/figures/
+
+/paper/text/*
+!/paper/text/abstract.tex
+!/paper/text/introduction.tex
+!/paper/text/setting.tex
+!/paper/text/identification.tex
+!/paper/text/completion.tex
+!/paper/text/realization.tex
+!/paper/text/spring.tex
+!/paper/text/laboratory.tex
+!/paper/text/discussion.tex
+!/paper/text/numerics.tex
+!/paper/text/forces.tex
+
+/paper/generated/*
+!/paper/generated/primary_fe_numbers.tex
+!/paper/generated/primary_fe_results.tex
+!/paper/generated/primary_fe_verification.tex
+!/paper/generated/primary_spatial_results.tex
+!/paper/generated/spring_worked.tex
+!/paper/generated/figure8_numbers.tex
+!/paper/generated/force_numbers.tex
+!/paper/generated/force_selection.tex
+
+/paper/figures/*
+!/paper/figures/model_story.tex
+
+# Figure PDFs included by the paper
+/figures/*
+!/figures/paper/
+/figures/paper/*
+!/figures/paper/experimental_overview.pdf
+!/figures/paper/frf_fullband.pdf
+!/figures/paper/frf_details_ad.pdf
+!/figures/paper/spring_overview.pdf
+!/figures/paper/spring_frf.pdf
+!/figures/paper/spatial_fullband.pdf
+!/figures/paper/force_two.pdf
+!/figures/paper/force_one.pdf
+
+# Scripts: the analysis pipeline only
+/scripts/*
+!/scripts/complete_model.py
+!/scripts/generate_figures.py
+!/scripts/figure_layout.py
+!/scripts/mesh_figure.py
+!/scripts/force_estimation.py
+!/scripts/spectral_assessment.py
+!/scripts/search_spatial_holdouts.py
+!/scripts/report_spatial_holdouts.py
+!/scripts/forced_holdouts.py
+
+# Caches anywhere
+__pycache__/
+*.py[cod]

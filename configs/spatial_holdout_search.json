@@ -1,0 +1,24 @@
+{
+  "output": "artifacts/spatial_holdout_search",
+  "seed_directory": "../DT_FE_tune_recovery_20261111/artifacts/model/laboratory",
+  "seed_fit_channels": [33, 34, 36, 37, 39],
+  "training_record": "test_96",
+  "screen_record": "test_101",
+  "assessment_record": "test_103",
+  "confirmation_record": "test_102",
+  "order": 384,
+  "bandwidth": 24,
+  "alpha": 0.00001,
+  "optimization_seconds": 300,
+  "completion_iterations": 2400,
+  "completion_tolerance": 0.0000002,
+  "relative_singular_margin": 0.001,
+  "trials": [
+    {"name": "hold_35_40", "held_channels": [8, 35, 40], "candidate_channels": [35, 40]},
+    {"name": "hold_38_40", "held_channels": [8, 38, 40], "candidate_channels": [38, 40]},
+    {"name": "hold_35_38_40", "held_channels": [8, 35, 38, 40], "candidate_channels": [35, 38, 40]}
+  ],
+  "selection": "Rank trials by worst absolute band-RMS level difference across candidate channels on record 101; break ties using mean absolute pointwise PSD level error, then normalized complex FRF error. Keep ACC8 as a reported diagnostic in every trial.",
+  "scope": "Exploratory channel selection. ACC35/38 were in the later accepted 31-response fit, which is never used as a seed here. Each trial excludes its held measurements from its entire fit ancestry, roughness selection, FE fields, coefficients and stopping. Historical development exposure prevents a claim of fully blind spatial validation.",
+  "confirmation": "Freeze selection before reading record 102 response values. Its P8 input is a ramp, so use measured-input output spectra and report the input-power ratio; do not claim two-input FRF validation. No selection updates after confirmation."
+}

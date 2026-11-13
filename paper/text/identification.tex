@@ -1,0 +1,16 @@
+\section{Step 1: fitting \texorpdfstring{$\theta$}{theta} at the ports}\label{sec:identification}
+Step~(i) of Eq.~\eqref{eq:two-steps} is a regression of the model FRF on the
+measured FRF with a regularization term:
+\begin{equation}
+ \min_{W,\,\omega>0,\,\Gamma\succ0}J(\theta),\qquad
+ J(\theta)=\underbrace{\frac1{Nmp}\sum_{\ell,o,i}
+ \left|\frac{[H_\theta(s_\ell)-\widehat H_\ell]_{oi}}{d_{oi}}\right|^2}_{\text{FRF misfit}}
+ +\underbrace{\beta\tr(W^{\top}GW)}_{\text{regularization}}.
+ \label{eq:objective}
+\end{equation}
+The misfit runs over all lines $\ell$, responses $o$ and forces $i$. Each
+transfer is scaled by its RMS magnitude $d_{oi}$ on the training record.
+Errors are reported as 100 times the square root of the misfit, in percent.
+The regularization uses a roughness matrix $G\succeq0$ to penalize uneven
+port rows $W$, with weight $\beta>0$. Appendix~\ref{sec:fit-details} gives
+the scales, the penalty and the local solver.
